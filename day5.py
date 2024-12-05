@@ -41,6 +41,39 @@ def part1(lines):
     return result
 
 
+def sort_page(orders: dict[str, set[str]], page: list[str]):
+    not_sorted = True
+    while not_sorted:
+        for val in page:
+            if val in orders:
+                val_idx = page.index(val)
+                invalid_afters = [
+                    after
+                    for after in orders[val]
+                    if after in page and page.index(after) < val_idx
+                ]
+                if len(invalid_afters) > 0:
+                    min_after = min([page.index(after) for after in invalid_afters])
+                    page.pop(val_idx)
+                    page.insert(min_after, val)
+                    break
+        else:
+            not_sorted = False
+
+
+def part2(lines):
+    orders, pages = parse_input(lines)
+
+    invalid_pages = [page for page in pages if not printing_is_valid(orders, page)]
+    result = 0
+    for page in invalid_pages:
+        sort_page(orders, page)
+        middle_idx = math.floor(len(page) / 2)
+        result += int(page[middle_idx])
+
+    return result
+
+
 example = """47|53
 97|13
 97|61
@@ -70,5 +103,5 @@ example = """47|53
 61,13,29
 97,13,75,29,47"""
 
-# print(part1(utils.example_lines(example)))
-print(part1(utils.get_day_lines(5)))
+# print(part2(utils.example_lines(example)))
+print(part2(utils.get_day_lines(5)))
