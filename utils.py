@@ -5,7 +5,7 @@ def get_day_data(day_num):
 
 def get_day_lines(day_num):
     with open(f"data/day{day_num}.txt") as f:
-        return f.readlines()
+        return f.read().splitlines()
 
 
 def example_lines(example):
