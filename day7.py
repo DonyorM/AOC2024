@@ -76,4 +76,4 @@ example = """190: 10 19
 292: 11 6 16 20"""
 
 # print(part2(utils.example_lines(example)))
-print(part2(utils.get_day_lines(7)))
+utils.timed_run(part2, utils.get_day_lines(7))
