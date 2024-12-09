@@ -1,3 +1,4 @@
+from collections import defaultdict
 import utils
 
 
@@ -68,6 +69,36 @@ def part1(input: str) -> int:
     return score_list(data)
 
 
+def pack_files(data: list[tuple[int, int, int]]):
+    move_idx = len(data) - 1
+    has_moved = defaultdict(lambda: False)
+    while move_idx >= 0:
+        block_idx, start, end = data[move_idx]
+        if has_moved[block_idx]:
+            move_idx -= 1
+            continue
+        length = end - start
+        for gap_end_idx in range(1, move_idx + 1):
+            _, _, prev_end = data[gap_end_idx - 1]
+            _, next_start, _ = data[gap_end_idx]
+            gap_length = next_start - prev_end
+            if gap_length >= length:
+                data.pop(move_idx)
+                data.insert(gap_end_idx, (block_idx, prev_end, prev_end + length))
+                has_moved[block_idx] = True
+                break
+        else:
+            move_idx -= 1
+
+
+def part2(input: str) -> int:
+    data = parse_input(input)
+    print("Number of blocks: ", len(data))
+    pack_files(data)
+    print("Packed data, now scoring")
+    return score_list(data)
+
+
 example = "2333133121414131402"
-# print(part1(example))
-print(part1(utils.get_day_data(9).strip()))
+# print(part2(example))
+print(part2(utils.get_day_data(9).strip()))
