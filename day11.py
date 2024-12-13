@@ -130,7 +130,7 @@ def parse_stones_memo_fives(stone: int, rounds_left: int, memo: int):
 
 def part2(line: str):
     total_rounds = 75
-    memo_count = 15
+    memo_count = 25
     stones = parse_line(line)
     memo = defaultdict(dict)
     final_result = 0
