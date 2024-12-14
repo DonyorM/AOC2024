@@ -43,6 +43,57 @@ def part1(robots, seconds, grid_width, grid_height):
     return top_left * top_right * bottom_left * bottom_right
 
 
+def print_map(positions, grid_width, grid_height):
+    grid = [["." for _ in range(grid_width)] for _ in range(grid_height)]
+    for pos in positions:
+        grid[pos[1]][pos[0]] = str(positions[pos])
+    for row in grid:
+        print("".join([str(x) for x in row]))
+
+
+def positions_dict(positions, seconds, grid_width, grid_height):
+    result = {}
+    for pos, vel in positions:
+        new_pos = get_robot_position(pos, vel, seconds, grid_width, grid_height)
+        if new_pos in result:
+            result[new_pos] += 1
+        else:
+            result[new_pos] = 1
+    return result
+
+
+def find_tree_point(positions: dict[tuple[int, int], int], grid_width, grid_height):
+    for pos in positions:
+        left = (pos[0] - 1, pos[1] + 1)
+        # middle = (pos[0], pos[1] + 1)
+        right = (pos[0] + 1, pos[1] + 1)
+        left2 = (pos[0] - 2, pos[1] + 2)
+        # middle2 = (pos[0], pos[1] + 2)
+        right2 = (pos[0] + 2, pos[1] + 2)
+
+        if (
+            left in positions
+            and left2 in positions
+            and right in positions
+            and right2 in positions
+        ):
+            return pos
+    return None
+
+
+# I just keep printing this until I found the right one
+def part2(robots, grid_width, grid_height):
+    seconds = 2095
+    while True:
+        positions = positions_dict(robots, seconds, grid_width, grid_height)
+        if find_tree_point(positions, grid_width, grid_height):
+            print("At second", seconds)
+            print_map(positions, grid_width, grid_height)
+            print()
+            input()
+        seconds += 1
+
+
 example = """p=0,4 v=3,-3
 p=6,3 v=-1,-3
 p=10,3 v=-1,2
@@ -57,4 +108,5 @@ p=2,4 v=2,-3
 p=9,5 v=-3,-3"""
 
 # print(part1(parse_robots(example), 100, 11, 7))
-print(part1(parse_robots(utils.get_day_data(14)), 100, 101, 103))
+# print(part(parse_robots(utils.get_day_data(14)), 100, 101, 103))
+part2(parse_robots(utils.get_day_data(14)), 101, 103)
