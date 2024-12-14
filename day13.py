@@ -29,8 +29,30 @@ def calculate_cost(input):
     return a_count * A_COST + b_count * B_COST
 
 
+def increase_cost(input):
+    input[4] += 10000000000000
+    input[5] += 10000000000000
+    return input
+
+
 def part1(text):
     return sum(calculate_cost(input) for input in parse_numbers(text))
+
+
+def calculate_cost_part_2(input):
+    a_x, a_y, b_x, b_y, prize_x, prize_y = input
+    b_count = (prize_y * a_x - prize_x * a_y) / (b_y * a_x - b_x * a_y)
+    a_count = (prize_x - b_count * b_x) / a_x
+
+    if a_count % 1 != 0 or b_count % 1 != 0:
+        return 0
+
+    return a_count * A_COST + b_count * B_COST
+
+
+def part2(text):
+    inputs = [increase_cost(input) for input in parse_numbers(text)]
+    return sum(calculate_cost_part_2(input) for input in inputs)
 
 
 example = """Button A: X+94, Y+34
@@ -49,5 +71,5 @@ Button A: X+69, Y+23
 Button B: X+27, Y+71
 Prize: X=18641, Y=10279"""
 
-# print(part1(example))
-print(part1(utils.get_day_data(13)))
+# print(part2(example))
+print(part2(utils.get_day_data(13)))
