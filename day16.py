@@ -3,10 +3,10 @@ import sys
 import utils
 
 POSSIBLE_DIRS = {
-    (1, 0): [(1, 0), (0, -1), (0, 1)],
-    (-1, 0): [(-1, 0), (0, -1), (0, 1)],
-    (0, 1): [(0, 1), (-1, 0), (1, 0)],
-    (0, -1): [(0, -1), (-1, 0), (1, 0)],
+    (1, 0): [(0, -1), (0, 1), (1, 0)],
+    (-1, 0): [(0, -1), (0, 1), (-1, 0)],
+    (0, 1): [(-1, 0), (1, 0), (0, 1)],
+    (0, -1): [(-1, 0), (1, 0), (0, -1)],
 }
 
 
@@ -18,56 +18,46 @@ def find_start(grid):
     return None
 
 
-def start_branch(
+def search_maze(
     grid,
-    current_loc,
-    current_dir,
-    score_to_reach_point,
-    current_best: int,
-    current_score: int,
+    start_loc,
+    start_dir,
 ):
-    x, y = current_loc
-    if grid[y][x] == "E":
-        return current_score
-
-    best = current_best
-    for dir in POSSIBLE_DIRS[current_dir]:
-        # if (x + dir[0], y + dir[1]) in visited_locs:
-        #     continue
-        if grid[y + dir[1]][x + dir[0]] == "#":
+    to_search = [(start_loc, start_dir, 0)]
+    score_to_reach_point = {start_loc: 0}
+    current_best = sys.maxsize
+    while len(to_search) > 0:
+        current_loc, current_dir, current_score = to_search.pop()
+        x, y = current_loc
+        if grid[y][x] == "E":
+            current_best = min(current_score, current_best)
             continue
 
-        new_score = current_score + 1
-        if dir != current_dir:
-            new_score += 1000
+        for dir in POSSIBLE_DIRS[current_dir]:
+            target_loc = (x + dir[0], y + dir[1])
+            if grid[target_loc[1]][target_loc[0]] == "#":
+                continue
 
-        target_loc = (x + dir[0], y + dir[1])
+            new_score = current_score + 1
+            if dir != current_dir:
+                new_score += 1000
 
-        if target_loc in score_to_reach_point and score_to_reach_point[target_loc] <= new_score:
-            continue
-        else:
-            score_to_reach_point[target_loc] = new_score
+            if new_score >= current_best:
+                continue
 
-        if new_score >= best:
-            continue
+            if target_loc in score_to_reach_point and score_to_reach_point[target_loc] <= new_score:
+                continue
+            else:
+                score_to_reach_point[target_loc] = new_score
 
-        result = start_branch(
-            grid,
-            target_loc,
-            dir,
-            score_to_reach_point,
-            best,
-            new_score,
-        )
+            to_search.append((target_loc, dir, new_score))
 
-        best = min(best, result)
-
-    return best
+    return current_best
 
 
 def part1(grid):
     start = find_start(grid)
-    return start_branch(grid, start, (1, 0), {}, sys.maxsize, 0)
+    return search_maze(grid, start, (1, 0))
 
 
 example = """###############
@@ -104,5 +94,6 @@ example2 = """#################
 #S#.............#
 #################"""
 
-# print(part1(utils.example_lines(example2)))
+# print(part1(utils.example_lines(example)))
+# 85440 is too high
 print(part1(utils.get_day_lines(16)))
